@@ -1,6 +1,4 @@
 /******************************************************************************
- *
- *
  * File Name: JarvisOS-kernel.c
  *
  * Description: Private Kernel Source File
@@ -13,11 +11,22 @@
 
 
 
-TCB Threads[NUM_OF_THREADS+1];                                /* Declare an array of Threads */
+TCB Threads[NUM_OF_THREADS+1];                                /* Declare an array of Threads. +1 for stateIdle subroutine */
 
 TCB *currPtr = NULL;                                          /* Pointer to the current running Thread */
 
 int32_t TCB_STACK[NUM_OF_THREADS+1][STACK_SIZE];
+
+uint8_t nextThreadIndex (TCB *ThreadsPtr)
+{
+    uint8_t Idx,nextIdx;
+
+    /*TODO:
+     *      Implement the logic to return the index of the highest priority and ready thread
+     */
+    return nextIdx;
+}
+
 
 /******************************************************************************
  *
@@ -32,9 +41,21 @@ int32_t TCB_STACK[NUM_OF_THREADS+1][STACK_SIZE];
  *****************************************************************************/
 void JARVIS_initKernel(void)
 {
+    currPtr = &Threads[nextThreadIndex(Threads)];
+
     SysTick_init();                                         /* Configure SysTick Timer to Round-Robin Quanta Value (in milliseconds) */
 
     Scheduler_init();                                       /* Assembly Function @ JarvisOS_port.asm */
+}
+
+void LoadNextThread(void)
+{
+    /* TODO:
+     *       Make a function that return back threads to ready state from suspended state
+     */
+    currPtr = &Threads[nextThreadIndex(Threads)];
+
+    return;
 }
 
 
@@ -108,6 +129,8 @@ void Generate_stateIdle (uint8_t Idx)
     TCB_STACK[Idx][STACK_SIZE-2] = (int32_t)(stateIdle);
     Threads[Idx].priority = 0;
     Threads[Idx].status = READY;
+
+    return;
 }
 
 
@@ -140,5 +163,66 @@ void stateIdle (void)
  *****************************************************************************/
 void Thread_Suspend (uint32_t port_DELAY)
 {
+    uint8_t Idx;
+
+    if (port_DELAY == 0)
+        return;
+
+    for (Idx = 0; Idx<NUM_OF_THREADS ; Idx++)
+    {
+        if (Threads[Idx].status == RUNNING)
+        {
+            Threads[Idx].status = SUSPENDED;
+            Threads[Idx].delayTime = port_DELAY;
+        }
+        else
+            Idx++;
+    }
+
+    ACCESS_REG(SysTick,STCURRENT) = 0;
     ACCESS_REG(SysTick,INTCTRL) = 0x04000000;
+
+    return;
+}
+
+/******************************************************************************
+ *
+ * Function Name: Thread_Block
+ *
+ * Description: API Function responsible for Blocking a thread from executing
+ *              till it's resumed
+ *
+ * Arguments:   void
+ * Return:      void
+ *
+ *****************************************************************************/
+void Thread_Block (void)
+{
+    uint8_t Idx;
+    for (Idx = 0; Idx<NUM_OF_THREADS ; Idx++)
+    {
+        if (Threads[Idx].status == RUNNING)
+            Threads[Idx].status = BLOCKED;
+        else
+            Idx++;
+    }
+
+    return;
+}
+
+/******************************************************************************
+ *
+ * Function Name: Thread_Resume
+ *
+ * Description: API Function responsible for continue a blocked thread and get
+ *              it back to ready state again.
+ *
+ * Arguments:   uint32_t port_DELAY
+ * Return:      void
+ *
+ *****************************************************************************/
+void Thread_Resume (void)
+{
+
+    return;
 }

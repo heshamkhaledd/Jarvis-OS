@@ -4,6 +4,7 @@
 
 			.thumb						;Execute the code in Thumb Mode
 			.ref	currPtr				;Extern currPtr from Jarvis-OS-Kernel.c
+			.ref	LoadNextThread
 			.def	SysTick_Handler		;Define SysTick_Handler Function (Like C Prototypes)
 			.def	Scheduler_init
 
@@ -18,8 +19,10 @@ SysTick_Handler: .asmfunc
 	LDR		R0,currThread		; R0 <- Current Thread TCB Address
 	LDR		R1,[R0]				; R1 <- The value that R0 is pointing at (Current Thread TCB Address)
 	STR		SP,[R1]				; [R1]=Current Thread TCB Stack Pointer Address <- Physical Stack Pointer
-	LDR		R1,[R1,#4]			; R1 <- current TCB->next
-	STR		R1,[R0]				; R0 <- Address of current TCB->next
+	PUSH	{R0,LR}
+	BL		LoadNextThread
+	POP		{R0,LR}
+	LDR		R1,[R0]
 	LDR		SP,[R1]				; SP <- R0
 	POP		{R4-R11}			; POP Registers of new Thread to the Register Bank
 	CPSIE	I					; Enable Global Interrupts

@@ -27,7 +27,7 @@
  ******************************************************************************/
 typedef enum
 {
-    READY,BLOCKED
+    READY,BLOCKED,SUSPENDED,RUNNING
 }Thread_Status;
 
 
@@ -38,7 +38,7 @@ struct TCB{
     TCB             *nextPtr;
     uint8_t         priority;
     Thread_Status   status;
-    uint32_t        delay_time;
+    uint32_t        delayTime;
 };
 
 /*******************************************************************************
@@ -49,6 +49,8 @@ void Scheduler_init (void);
 void Thread_Suspend (uint32_t);
 void stateIdle (void);
 void Generate_stateIdle (uint8_t Idx);
+void LoadNextThread(void);
+uint8_t nextThreadIndex (TCB *ThreadsPtr);
 
 
 /*******************************************************************************
@@ -56,6 +58,8 @@ void Generate_stateIdle (uint8_t Idx);
  ******************************************************************************/
 uint8_t ThreadCreate(void(*Thread)(void), uint8_t a_priority);
 void JARVIS_initKernel (void);
+void Thread_Block (void);
+void Thread_Resume (void);
 
 
 #endif

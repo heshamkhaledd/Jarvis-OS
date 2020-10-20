@@ -8,7 +8,7 @@ void Thread_1(void)
     while (1)
     {
         Counter_1++;
-        //Thread_Suspend(50);
+        Thread_Suspend(50);
     }
 }
 
@@ -19,7 +19,7 @@ void Thread_2(void)
     while (1)
     {
         Counter_2++;
-        //Thread_Suspend(50);
+        Thread_Suspend(50);
     }
 }
 
@@ -30,7 +30,7 @@ void Thread_3(void)
     while (1)
     {
         Counter_3++;
-        //Thread_Suspend(50);
+        Thread_Suspend(50);
     }
 }
 
