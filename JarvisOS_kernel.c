@@ -17,13 +17,18 @@ TCB *currPtr = NULL;                                          /* Pointer to the 
 
 int32_t TCB_STACK[NUM_OF_THREADS+1][STACK_SIZE];
 
+static uint32_t Jarvis_Ticks = 0;
+
 uint8_t nextThreadIndex (TCB *ThreadsPtr)
 {
-    uint8_t Idx,nextIdx;
+    uint8_t Idx,nextIdx = 0;
 
-    /*TODO:
-     *      Implement the logic to return the index of the highest priority and ready thread
-     */
+    for (Idx = 0 ; Idx < NUM_OF_THREADS ; Idx++)
+    {
+        if(Threads[Idx].status == READY && Threads[Idx].priority > nextIdx)
+            nextIdx = Idx;
+    }
+
     return nextIdx;
 }
 
@@ -48,12 +53,30 @@ void JARVIS_initKernel(void)
     Scheduler_init();                                       /* Assembly Function @ JarvisOS_port.asm */
 }
 
+
+void checkSuspendedState (void)
+{
+    uint8_t Idx;
+    Jarvis_Ticks++;
+    for (Idx = 0 ; Idx <NUM_OF_THREADS ; Idx++)
+    {
+        if (Threads[Idx].status == SUSPENDED && Threads[Idx].delayTime == Jarvis_Ticks)
+            Threads[Idx].status = READY;
+    }
+    return;
+}
+
+
 void LoadNextThread(void)
 {
-    /* TODO:
-     *       Make a function that return back threads to ready state from suspended state
-     */
-    currPtr = &Threads[nextThreadIndex(Threads)];
+    uint8_t Idx;
+    checkSuspendedState ();
+
+    Idx = nextThreadIndex(Threads);
+
+    currPtr = &Threads[Idx];
+
+    Threads[Idx].status = RUNNING;
 
     return;
 }
@@ -173,7 +196,12 @@ void Thread_Suspend (uint32_t port_DELAY)
         if (Threads[Idx].status == RUNNING)
         {
             Threads[Idx].status = SUSPENDED;
-            Threads[Idx].delayTime = port_DELAY;
+            port_DELAY = port_DELAY / QUANTA;
+
+            if (port_DELAY == 0)
+                port_DELAY = 1;
+
+            Threads[Idx].delayTime = Jarvis_Ticks + port_DELAY;
         }
         else
             Idx++;
