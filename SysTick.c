@@ -1,11 +1,11 @@
 /******************************************************************************
  *
  *
- * File Name: SysTick.c
+ * [File Name]:     SysTick.c
  *
- * Description: SysTick Timer Source File
+ * [Description]:   SysTick Timer Source File
  *
- * Engineer: Hesham Khaled
+ * [Engineer]:      Hesham Khaled
  *
  *******************************************************************************/
 
@@ -17,12 +17,12 @@
 
 /******************************************************************************
  *
- * Function Name: SysTick_init
+ * [Function Name]:     SysTick_init
  *
- * Description: Responsible for Initializing SysTick Hardware and configuring it
+ * [Description]:       Responsible for Initializing SysTick Hardware and configuring it
  *
- * Arguments:   void
- * Return:      void
+ * [Arguments]:         void
+ * [Return]:            void
  *
  *****************************************************************************/
 void SysTick_init (void)

@@ -1,11 +1,11 @@
 /******************************************************************************
  *
  *
- * File Name: SysTick.h
+ * [File Name]:     SysTick.h
  *
- * Description: SysTick Timer Header File
+ * [Description]:   SysTick Timer Header File
  *
- * Engineer: Hesham Khaled
+ * [Engineer]:      Hesham Khaled
  *
  *******************************************************************************/
 

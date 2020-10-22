@@ -11,10 +11,11 @@
 #ifndef _JARVISOS_CONFIG_H
 #define _JARVISOS_CONFIG_H
 
-#define F_CPU           16000000
-#define NUM_OF_THREADS  3
-#define STACK_SIZE      100
-#define QUANTA          50
+#define F_CPU                   16000000
+#define NUM_OF_THREADS          3
+#define STACK_SIZE              100
+#define QUANTA                  100
+#define ThreadID_MAX_LENGTH     15
 
 
 #endif

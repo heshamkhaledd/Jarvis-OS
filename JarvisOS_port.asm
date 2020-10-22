@@ -1,6 +1,6 @@
-;Filename:		Jarvis-OS_port.asm
-;Description:	Assembly file used to port Jarvis-OS to ARM-Cortex M4 Processor
-;Engineer:		Hesham Khaled
+; [Filename]:		JarvisOS_port.asm
+; [Description]:	Assembly file used to port Jarvis-OS to ARM-Cortex M4 Processor
+; [Engineer]:		Hesham Khaled
 
 			.thumb						;Execute the code in Thumb Mode
 			.ref	currPtr				;Extern currPtr from Jarvis-OS-Kernel.c
@@ -10,8 +10,8 @@
 
 currThread:	.word	currPtr
 
-;Function Name: SysTick_Handler
-;Description:	Function responsible for context switching between threads
+; [Function Name]:	SysTick_Handler
+; [Description]:	Function responsible for context switching between threads
 	.align 4
 SysTick_Handler: .asmfunc
 	CPSID	I					; Disable Global Interrupts
@@ -29,8 +29,8 @@ SysTick_Handler: .asmfunc
 	BX		LR					; Return
 				.endasmfunc
 
-;Function Name: Scheduler_init
-;Description:	Function responsible for initializing SP to thread stack.
+; [Function Name]:	Scheduler_init
+; [Description]:	Function responsible for initializing SP to thread stack.
 	.align 4
 Scheduler_init: .asmfunc
 	CPSID	I					; Disable Global Interrupts
