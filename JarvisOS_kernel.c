@@ -281,7 +281,7 @@ void Thread_Suspend (uint32_t port_DELAY)
         else
             continue;
     }
-
+    ACCESS_REG(SysTick,STCURRENT) = 0;
     ACCESS_REG(SysTick,INTCTRL) = 0x04000000;               /* Trigger SysTick_Handler found @ JarvisOS_port.asm */
 }
 
