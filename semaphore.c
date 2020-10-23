@@ -9,7 +9,6 @@
 #include "semaphore.h"
 
 
-
 /******************************************************************************
  *
  * [Function Name]: CreateBinarySemaphore
