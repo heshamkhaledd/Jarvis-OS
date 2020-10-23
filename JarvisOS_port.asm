@@ -19,7 +19,7 @@ SysTick_Handler: .asmfunc
 	LDR		R0,currThread		; R0 <- Current Thread TCB Address
 	LDR		R1,[R0]				; R1 <- The value that R0 is pointing at (Current Thread TCB Address)
 	STR		SP,[R1]				; [R1]=Current Thread TCB Stack Pointer Address <- Physical Stack Pointer
-	PUSH	{R0,LR}
+	PUSH	{R0,LR}				; Push R0 and Link Register before calling A .c function
 	BL		LoadNextThread
 	POP		{R0,LR}
 	LDR		R1,[R0]

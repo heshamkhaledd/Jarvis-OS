@@ -239,7 +239,7 @@ void ThreadCreate(uint8_t *idPtr, void(*Thread)(void), uint8_t a_priority)
  * [Description]:       Subroutine responsible for creating a wait state task (Wait Task)
  *                      to run when all other threads are suspended.
  *
- * [Arguments]:         void
+ * [Arguments]:         uint8_t Idx
  * [Return]:            void
  *
  *****************************************************************************/
@@ -312,7 +312,7 @@ void Thread_Suspend (uint32_t port_DELAY)
  * [Description]:       API Function responsible for Blocking a thread from executing
  *                      till it's resumed
  *
- * [Arguments]:         uint8_t ThreadID[ThreadID_MAX_LENGTH]
+ * [Arguments]:         uint8_t *idPtr
  * [Return]:            void
  *
  *****************************************************************************/
@@ -339,7 +339,7 @@ void Thread_Block (uint8_t *idPtr)
  * [Description]:       API Function responsible for continue a blocked thread and get
  *                      it back to ready state again.
  *
- * [Arguments]:         uint8_t ThreadID[ThreadID_MAX_LENGTH]
+ * [Arguments]:         uint8_t *idPtr
  * [Return]:            void
  *
  *****************************************************************************/

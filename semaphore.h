@@ -1,7 +1,7 @@
 /******************************************************************************
  * [File Name]:     semaphore.h
  *
- * [Description]:   Semaphore Implementation Source File
+ * [Description]:   Semaphore Implementation Header File
  *
  * [Engineer]:      Hesham Khaled
  *
