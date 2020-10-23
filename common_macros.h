@@ -13,10 +13,6 @@
 #ifndef COMMON_MACROS
 #define COMMON_MACROS
 
-/* Enable Global Interrupt bit */
-#define sei()            __asm("CPSIE:")
-#define cli()            __asm("CPSID:")
-
 /* Access a specific register of a given port */
 #define ACCESS_REG(BASE,OFFSET) (*((volatile uint32_t*)(BASE+OFFSET)))
 

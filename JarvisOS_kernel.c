@@ -9,6 +9,7 @@
 
 #include "JarvisOS_kernel.h"
 
+
 /*******************************************************************************
  *                          Global Variables
  ******************************************************************************/
@@ -19,6 +20,23 @@ TCB *currPtr = NULL;                                        /* Pointer to the cu
 int32_t TCB_STACK[NUM_OF_THREADS+1][STACK_SIZE];            /* Declaring TCB (Threads) Stack */
 
 static volatile uint32_t Jarvis_Ticks = 0;                  /* Global Variable to count SysTick countdown times */
+
+
+/*******************************************************************************
+ *                              Atomic Functions
+ ******************************************************************************/
+void sei (void)
+{
+    __asm("CPSID:");
+    return;
+}
+
+void cli (void)
+{
+    __asm("CPSIE:");
+    return;
+}
+
 
 /*******************************************************************************
  *                          Basic C String Functions
@@ -124,7 +142,10 @@ void checkSuspendedState (void)
     for (Idx = 0 ; Idx <NUM_OF_THREADS ; Idx++)
     {
         if (Threads[Idx].status == SUSPENDED && Threads[Idx].delayTime == Jarvis_Ticks)
-            Threads[Idx].status = READY;
+            {
+                Threads[Idx].status = READY;
+                Threads[Idx].delayTime = 0;
+            }
     }
     Jarvis_Ticks++;
     return;
@@ -186,9 +207,9 @@ void JARVIS_initStack (uint8_t Idx) {
  * [Return]:            uint8_t
  *
  *****************************************************************************/
-uint8_t ThreadCreate(uint8_t *idPtr, void(*Thread)(void), uint8_t a_priority)
+void ThreadCreate(uint8_t *idPtr, void(*Thread)(void), uint8_t a_priority)
 {
-    __asm("CPSID:");                                        /* Disable Global Interrupt bit */
+    cli();                                                  /* Disable Global Interrupt bit */
 
     static uint8_t Idx = 0;
 
@@ -207,9 +228,7 @@ uint8_t ThreadCreate(uint8_t *idPtr, void(*Thread)(void), uint8_t a_priority)
     if (Idx == NUM_OF_THREADS)                              /* Create IdleThread if we reached maximum number of allowed threads */
         Generate_stateIdle (Idx);
 
-    __asm("CPSIE:");                                        /* Enable Global Interrupt bit */
-
-    return 1;
+    sei();                                                  /* Enable Global Interrupt bit */
 }
 
 

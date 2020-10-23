@@ -57,7 +57,7 @@ void JARVIS_initKernel (void);
 void Thread_Block (uint8_t ThreadID[ThreadID_MAX_LENGTH]);
 void Thread_Resume (uint8_t ThreadID[ThreadID_MAX_LENGTH]);
 void Thread_Suspend (uint32_t);
-uint8_t ThreadCreate(uint8_t ThreadID[ThreadID_MAX_LENGTH],void(*Thread)(void), uint8_t a_priority);
+void ThreadCreate(uint8_t ThreadID[ThreadID_MAX_LENGTH],void(*Thread)(void), uint8_t a_priority);
 
 
 #endif

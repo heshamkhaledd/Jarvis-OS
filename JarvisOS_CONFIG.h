@@ -16,6 +16,7 @@
 #define STACK_SIZE              100
 #define QUANTA                  100
 #define ThreadID_MAX_LENGTH     15
+#define port_MAX_DELAY          2
 
 
 #endif
