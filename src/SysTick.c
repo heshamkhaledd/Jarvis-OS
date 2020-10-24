@@ -42,6 +42,4 @@ void SysTick_init (void)
      * 3. Set SysTick Clock to CPU Clock
      */
     ACCESS_REG(SysTick,STCTRL) |= 0x00000007;
-
-    return;
 }

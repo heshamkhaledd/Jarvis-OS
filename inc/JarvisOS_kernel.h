@@ -14,13 +14,8 @@
 #include <stdint.h>
 #include "SysTick.h"
 #include "JarvisOS_CONFIG.h"
+#include "common_funs.h"
 
-
-/* Time MACRO */
-#define MS_TO_TICKS( xTimeInMs ) ( ( uint32_t ) ( ( ( uint32_t ) ( xTimeInMs ) * ( uint32_t ) F_CPU ) / ( uint32_t ) 1000 ) )
-
-/* NULL Definition */
-#define NULL (void*) 0
 
 /*******************************************************************************
  *                          Task Control Block (TCB)
@@ -32,7 +27,7 @@ typedef enum
 
 typedef struct{
     int32_t         *stackPtr;
-    uint8_t         ThreadID[ThreadID_MAX_LENGTH];
+    uint8_t         ThreadID[THREAD_ID_MAX_LENGTH];
     uint8_t         priority;
     Thread_Status   status;
     uint32_t        delayTime;
@@ -54,10 +49,10 @@ uint8_t nextThreadIndex (TCB *ThreadsPtr);
  *                          Public Functions Prototypes.
  ******************************************************************************/
 void JARVIS_initKernel (void);
-void Thread_Block (uint8_t ThreadID[ThreadID_MAX_LENGTH]);
-void Thread_Resume (uint8_t ThreadID[ThreadID_MAX_LENGTH]);
+void Thread_Block (uint8_t ThreadID[THREAD_ID_MAX_LENGTH]);
+void Thread_Resume (uint8_t ThreadID[THREAD_ID_MAX_LENGTH]);
 void Thread_Suspend (uint32_t);
-void ThreadCreate(uint8_t ThreadID[ThreadID_MAX_LENGTH],void(*Thread)(void), uint8_t a_priority);
+void ThreadCreate(uint8_t ThreadID[THREAD_ID_MAX_LENGTH],void(*Thread)(void), uint8_t a_priority);
 
 
 #endif

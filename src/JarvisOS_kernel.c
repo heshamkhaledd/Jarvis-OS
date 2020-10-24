@@ -13,13 +13,17 @@
 /*******************************************************************************
  *                          Global Variables
  ******************************************************************************/
-TCB Threads[NUM_OF_THREADS+1];                              /* Declare an array of Threads. +1 for stateIdle subroutine */
+/* Declare an array of g_Threads. +1 for stateIdle subroutine */
+static TCB g_Threads[NUM_OF_THREADS+1];
 
-TCB *currPtr = NULL;                                        /* Pointer to the current running Thread */
+/* Pointer to the current running Thread */
+static TCB *g_curr_running_thread = NULL;
 
-int32_t TCB_STACK[NUM_OF_THREADS+1][STACK_SIZE];            /* Declaring TCB (Threads) Stack */
+/* Declaring TCB (g_Threads) Stack */
+static int32_t TCB_Stack[NUM_OF_THREADS+1][STACK_SIZE];
 
-static volatile uint32_t Jarvis_Ticks = 0;                  /* Global Variable to count SysTick countdown times */
+/* Global Variable to count SysTick countdown times */
+static volatile uint32_t Jarvis_Ticks = 0;
 
 
 /*******************************************************************************
@@ -38,37 +42,6 @@ void cli (void)
 }
 
 
-/*******************************************************************************
- *                          Basic C String Functions
- ******************************************************************************/
-int8_t strcmp(const uint8_t *Str_1, const uint8_t *Str_2)
-{
-    while (*Str_1)
-    {
-        if (*Str_1 != *Str_2)
-            return -1;
-
-        Str_1++;
-        Str_2++;
-    }
-    return 0;
-}
-void strcpy (uint8_t *destination, const uint8_t *source)
-{
-    if (destination == NULL)
-            return;
-
-        while (*source != '\0')
-        {
-            *destination = *source;
-            destination++;
-            source++;
-        }
-        *destination = '\0';
-
-        return;
-}
-
 /******************************************************************************
  *
  * [Function Name]: nextThreadIndex
@@ -82,8 +55,11 @@ void strcpy (uint8_t *destination, const uint8_t *source)
  *****************************************************************************/
 uint8_t nextThreadIndex (TCB *ThreadsPtr)
 {
-    uint8_t Idx,nextIdx=NUM_OF_THREADS;                     /* Next Thread to run index, by default, is assigned to the IdleThread */
-    uint8_t max = 0;                                        /* Next Thread to run priority, by defauly, is assigned to the lowest priority */
+    /* Next Thread to run index, by default, is assigned to the IdleThread */
+    uint8_t Idx,nextIdx=NUM_OF_THREADS;
+
+    /* Next Thread to run priority, by defauly, is assigned to the lowest priority */
+    uint8_t max = 0;
 
     for (Idx = 0 ; Idx < NUM_OF_THREADS ; Idx++)
     {
@@ -112,15 +88,19 @@ void JARVIS_initKernel(void)
 {
     uint8_t Idx;
 
-    Idx = nextThreadIndex(Threads);                         /* Call nextThreadIndex to know which Thread will initially run */
+    /* Call nextThreadIndex to know which Thread will initially run */
+    Idx = nextThreadIndex(g_Threads);
 
-    currPtr = &Threads[Idx];
+    g_curr_running_thread = &g_Threads[Idx];
 
-    Threads[Idx].status = RUNNING;                          /* Assign the running state to the initial thread */
+    /* Assign the running state to the initial thread */
+    g_Threads[Idx].status = RUNNING;
 
-    SysTick_init();                                         /* Configure SysTick Timer to Round-Robin Quanta Value (in milliseconds) */
+    /* Configure SysTick Timer to Round-Robin Quanta Value (in milliseconds) */
+    SysTick_init();
 
-    Scheduler_init();                                       /* Assembly Function @ JarvisOS_port.asm */
+    /* Assembly Function @ JarvisOS_port.asm */
+    Scheduler_init();
 }
 
 
@@ -141,10 +121,10 @@ void checkSuspendedState (void)
 
     for (Idx = 0 ; Idx <NUM_OF_THREADS ; Idx++)
     {
-        if (Threads[Idx].status == SUSPENDED && Threads[Idx].delayTime == Jarvis_Ticks)
+        if (g_Threads[Idx].status == SUSPENDED && g_Threads[Idx].delayTime == Jarvis_Ticks)
             {
-                Threads[Idx].status = READY;
-                Threads[Idx].delayTime = 0;
+                g_Threads[Idx].status = READY;
+                g_Threads[Idx].delayTime = 0;
             }
     }
     Jarvis_Ticks++;
@@ -167,14 +147,14 @@ void LoadNextThread(void)
     uint8_t Idx;
     checkSuspendedState ();                                 /* Release suspended tasks first before choosing the next thread to run */
 
-    Idx = nextThreadIndex(Threads);
+    Idx = nextThreadIndex(g_Threads);
 
-    currPtr = &Threads[Idx];
+    g_curr_running_thread = &g_Threads[Idx];
 
-    if(Threads[NUM_OF_THREADS].status == RUNNING)           /* If the idleThread was running before this thread, return it to ready state */
-        Threads[NUM_OF_THREADS].status = READY;
+    if(g_Threads[NUM_OF_THREADS].status == RUNNING)           /* If the idleThread was running before this thread, return it to ready state */
+        g_Threads[NUM_OF_THREADS].status = READY;
 
-    Threads[Idx].status = RUNNING;                          /* Assign the next thread to run to the running state */
+    g_Threads[Idx].status = RUNNING;                          /* Assign the next thread to run to the running state */
 
     return;
 }
@@ -192,8 +172,8 @@ void LoadNextThread(void)
  *****************************************************************************/
 void JARVIS_initStack (uint8_t Idx) {
 
-    Threads[Idx].stackPtr = &TCB_STACK[Idx][STACK_SIZE-16]; /* Make the Thread stack pointer points to the Stack Frame section in the thread's stack */
-    TCB_STACK[Idx][STACK_SIZE-1] = 0x1000000;               /* Assign Thread to execute in Thumb mode */
+    g_Threads[Idx].stackPtr = &TCB_Stack[Idx][STACK_SIZE-16]; /* Make the Thread stack pointer points to the Stack Frame section in the thread's stack */
+    TCB_Stack[Idx][STACK_SIZE-1] = 0x1000000;               /* Assign Thread to execute in Thumb mode */
 }
 
 
@@ -215,13 +195,13 @@ void ThreadCreate(uint8_t *idPtr, void(*Thread)(void), uint8_t a_priority)
 
     JARVIS_initStack(Idx);                                  /* Initialize Thread Stack */
 
-    TCB_STACK[Idx][STACK_SIZE-2] = (int32_t)(Thread);       /* Thread PC <- Thread Address */
+    TCB_Stack[Idx][STACK_SIZE-2] = (int32_t)(Thread);       /* Thread PC <- Thread Address */
 
-    Threads[Idx].priority = a_priority;                     /* Assign Thread Priority */
+    g_Threads[Idx].priority = a_priority;                     /* Assign Thread Priority */
 
-    Threads[Idx].status = READY;                            /* Thread is initialized in Ready state */
+    g_Threads[Idx].status = READY;                            /* Thread is initialized in Ready state */
 
-    strcpy(Threads[Idx].ThreadID,idPtr);                    /* Assign Thread ID */
+    strcpy(g_Threads[Idx].ThreadID,idPtr);                    /* Assign Thread ID */
 
     Idx++;
 
@@ -246,9 +226,9 @@ void ThreadCreate(uint8_t *idPtr, void(*Thread)(void), uint8_t a_priority)
 void Generate_stateIdle (uint8_t Idx)
 {
     JARVIS_initStack(Idx);                                  /* Create stack for IdleThread */
-    TCB_STACK[Idx][STACK_SIZE-2] = (int32_t)(stateIdle);    /* Make the PC initially point to IdleThread address */
-    Threads[Idx].priority = 0;                              /* Assign in to Kernel's lowest priority */
-    Threads[Idx].status = READY;                            /* Initialize it as ready */
+    TCB_Stack[Idx][STACK_SIZE-2] = (int32_t)(stateIdle);    /* Make the PC initially point to IdleThread address */
+    g_Threads[Idx].priority = 0;                              /* Assign in to Kernel's lowest priority */
+    g_Threads[Idx].status = READY;                            /* Initialize it as ready */
 
     return;
 }
@@ -288,17 +268,15 @@ void Thread_Suspend (uint32_t port_DELAY)
     if (port_DELAY == 0)                                    /* if port_DELAY time is zero, do nothing and return */
         return;
 
-    for (Idx = 0; Idx<NUM_OF_THREADS ; Idx++)               /* Keep looping on Threads until it finds the Thread who called it */
+    for (Idx = 0; Idx<NUM_OF_THREADS ; Idx++)               /* Keep looping on g_Threads until it finds the Thread who called it */
     {
-        if (Threads[Idx].status == RUNNING)
+        if (g_Threads[Idx].status == RUNNING)
         {
-            Threads[Idx].status = SUSPENDED;
+            g_Threads[Idx].status = SUSPENDED;
 
-            Threads[Idx].delayTime = Jarvis_Ticks + port_DELAY;
+            g_Threads[Idx].delayTime = Jarvis_Ticks + port_DELAY;
             break;
         }
-        else
-            continue;
     }
     ACCESS_REG(SysTick,STCURRENT) = 0;
     ACCESS_REG(SysTick,INTCTRL) = 0x04000000;               /* Trigger SysTick_Handler found @ JarvisOS_port.asm */
@@ -319,17 +297,14 @@ void Thread_Suspend (uint32_t port_DELAY)
 void Thread_Block (uint8_t *idPtr)
 {
     uint8_t Idx;
-    for (Idx = 0 ; Idx < NUM_OF_THREADS ; Idx++)            /* Keep looping on Threads until it finds the thread required to be blocked */
+    for (Idx = 0 ; Idx < NUM_OF_THREADS ; Idx++)            /* Keep looping on g_Threads until it finds the thread required to be blocked */
     {
-        if(strcmp(idPtr,Threads[Idx].ThreadID) == 0)
+        if(strcmp(idPtr,g_Threads[Idx].ThreadID) == 0)
         {
-            Threads[Idx].status = BLOCKED;
+            g_Threads[Idx].status = BLOCKED;
             break;
         }
-        else
-            continue;
     }
-    return;
 }
 
 /******************************************************************************
@@ -348,13 +323,10 @@ void Thread_Resume (uint8_t *idPtr)
     uint8_t Idx;
     for (Idx = 0 ; Idx < NUM_OF_THREADS ; Idx++)
     {
-        if(strcmp(idPtr,Threads[Idx].ThreadID) == 0)        /* Keep looping on Threads until it finds the thread required to be resumed */
+        if(strcmp(idPtr,g_Threads[Idx].ThreadID) == 0)        /* Keep looping on g_Threads until it finds the thread required to be resumed */
         {
-            Threads[Idx].status = READY;
+            g_Threads[Idx].status = READY;
             break;
         }
-        else
-            continue;
     }
-    return;
 }

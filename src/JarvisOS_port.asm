@@ -2,13 +2,13 @@
 ; [Description]:	Assembly file used to port Jarvis-OS to ARM-Cortex M4 Processor
 ; [Engineer]:		Hesham Khaled
 
-			.thumb						;Execute the code in Thumb Mode
-			.ref	currPtr				;Extern currPtr from Jarvis-OS-Kernel.c
+			.thumb										;Execute the code in Thumb Mode
+			.ref	g_curr_running_thread				;Extern currPtr from Jarvis-OS-Kernel.c
 			.ref	LoadNextThread
-			.def	SysTick_Handler		;Define SysTick_Handler Function (Like C Prototypes)
+			.def	SysTick_Handler						;Define SysTick_Handler Function (Like C Prototypes)
 			.def	Scheduler_init
 
-currThread:	.word	currPtr
+currThread:	.word	g_curr_running_thread
 
 ; [Function Name]:	SysTick_Handler
 ; [Description]:	Function responsible for context switching between threads

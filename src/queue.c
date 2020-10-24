@@ -27,18 +27,20 @@ QueueHandle_t QueueCreate(uint32_t length, uint8_t size)
     QueueHandle_t queue = (QueueHandle_t) malloc(sizeof(xQUEUE));
 
     if (queue == NULL)
-    {
         return NULL;
-    }
+
     else
     {
         queue->tail = 0;
         queue->head = 0;
         queue->length = length;
-        queue->Ptr = (uint32_t *) calloc(length,size);
+        queue->Data_Ptr = (uint32_t *) calloc(length,size);
         queue->size = 0;
 
-        return queue;
+        if(queue->Data_Ptr == NULL)
+            return NULL;
+        else
+            return queue;
     }
 }
 
@@ -56,17 +58,19 @@ QueueHandle_t QueueCreate(uint32_t length, uint8_t size)
  *****************************************************************************/
 int8_t QueueWrite(QueueHandle_t queue, uint32_t data)
 {
-    if (QueueIsFull(queue))
-    {
-        return -1;
-    }
+    if (queue == NULL)
+        return ERROR_QUEUE_NULL;
+        
+    else if (QueueIsFull(queue))
+        return ERROR_QUEUE_FULL;
+
     else
     {
-        queue->Ptr[queue->tail] = (size_t)data;
+        queue->Data_Ptr[queue->tail] = (size_t)data;
         queue->tail = (queue->tail + 1) % (queue->length);
         queue->size  = queue->size + 1;
     }
-    return 1;
+    return SUCCESS;
 }
 
 /******************************************************************************
@@ -83,19 +87,21 @@ int8_t QueueWrite(QueueHandle_t queue, uint32_t data)
 
 int8_t QueueReceive(QueueHandle_t queue,uint32_t *var)
 {
-    if (QueueIsEmpty(queue))
-    {
-        return -1;
-    }
+    if (queue == NULL)
+        return ERROR_QUEUE_NULL;
+
+    else if (QueueIsEmpty(queue))
+        return ERROR_QUEUE_EMPTY;
+
     else
     {
-        *var = (queue->Ptr[queue->head]);
+        *var = (queue->Data_Ptr[queue->head]);
 
         queue->head = (queue->head + 1) % (queue->length);
 
         queue->size  = queue->size - 1;
     }
-    return 1;
+    return SUCCESS;
 }
 
 /******************************************************************************

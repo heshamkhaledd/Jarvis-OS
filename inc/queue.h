@@ -11,11 +11,17 @@
 #define _QUEUE_H
 
 #include <stdint.h>
+#include "JarvisOS_CONFIG.h"
 
-#define NULL (void*) 0
+typedef enum {
+    SUCCESS,
+    ERROR_QUEUE_FULL,
+    ERROR_QUEUE_EMPTY,
+    ERROR_QUEUE_NULL
+}Queue_ErrorCode;
 
 typedef struct{
-    uint32_t        *Ptr;
+    uint32_t        *Data_Ptr;
     uint32_t        tail;
     uint32_t        head;
     uint32_t        length;

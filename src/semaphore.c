@@ -8,6 +8,9 @@
  *******************************************************************************/
 #include "semaphore.h"
 
+extern void Thread_Suspend (uint32_t port_DELAY);
+extern void sei (void);
+extern void cli (void);
 
 /******************************************************************************
  *
@@ -19,10 +22,9 @@
  * [Return]:        void
  *
  *****************************************************************************/
-void CreateBinarySemaphore (SemaphoreHandle_t *semaphore)
+void SemaphoreCreateBinary (SemaphoreHandle_t *semaphore)
 {
     *semaphore = 1;
-    return;
 }
 
 /******************************************************************************
@@ -35,10 +37,9 @@ void CreateBinarySemaphore (SemaphoreHandle_t *semaphore)
  * [Return]:        void
  *
  *****************************************************************************/
-void CreateSemaphore (SemaphoreHandle_t *semaphore, uint32_t num_of_tokens)
+void SemaphoreCreate (SemaphoreHandle_t *semaphore, uint32_t num_of_tokens)
 {
     *semaphore = num_of_tokens;
-    return;
 }
 
 /******************************************************************************
@@ -61,8 +62,6 @@ void SemaphorePend (SemaphoreHandle_t *semaphore, uint32_t ThreadDelay)
     *semaphore = *semaphore - 1;
 
     cli();
-    
-    return;
 }
 
 /******************************************************************************
@@ -78,9 +77,6 @@ void SemaphorePend (SemaphoreHandle_t *semaphore, uint32_t ThreadDelay)
 void SemaphorePost (SemaphoreHandle_t *semaphore)
 {
     sei();
-
     *semaphore = *semaphore + 1;
-
     cli();
-    return;
 }
