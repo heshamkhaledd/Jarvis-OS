@@ -66,7 +66,7 @@ int8_t QueueWrite(QueueHandle_t queue, uint32_t data)
         queue->tail = (queue->tail + 1) % (queue->length);
         queue->size  = queue->size + 1;
     }
-    return 0;
+    return 1;
 }
 
 /******************************************************************************
@@ -95,7 +95,7 @@ int8_t QueueReceive(QueueHandle_t queue,uint32_t *var)
 
         queue->size  = queue->size - 1;
     }
-    return 0;
+    return 1;
 }
 
 /******************************************************************************
