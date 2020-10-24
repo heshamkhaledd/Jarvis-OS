@@ -393,7 +393,7 @@ void Thread_8(void)
 
         int8_t var = QueueReceive(queue_1,&data_receive);
 
-        if (var == -1)
+        if (var == ERROR_QUEUE_EMPTY)
         {
             /* Code to handle the case */
         }
