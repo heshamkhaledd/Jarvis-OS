@@ -28,6 +28,7 @@ Table of contents
         * [QueueIsEmpty](#QueueIsEmpty)
         * [QueueIsFull](#QueueIsFull)
 * [Notes](#Notes)
+* [Building ARM Project](#Building-ARM-Project)
 <!--te-->
 
 ## Jarvis-OS User Configurations
@@ -57,7 +58,7 @@ ___
 * **Return**: `void`<br />
 * **Example**:
 ```c
-void Thread_Name (void){
+void Thread_1 (void){
     /* Thread inits */
     while (1)
     {
@@ -67,7 +68,7 @@ void Thread_Name (void){
 
 int main ()
 {
-    ThreadCreate ("ThreadID_1",Thread_Name,5);
+    ThreadCreate ("ThreadID_1",Thread_1,5);
     /* Rest of main */
 }
 ```
@@ -84,7 +85,7 @@ ___
 * **Return**: `void`<br />
 * **Example**:
 ```c
-void Thread_Address (void){
+void Thread_2 (void){
     /* Thread inits */
     while (1)
     {
@@ -96,7 +97,7 @@ void Thread_Address (void){
 ___
 
 3) ### Thread_Block
-* **Description**: Blocks a task entirely and put it in blocked state   <br />
+* **Description**: Blocks a thread entirely and put it in blocked state   <br />
 * **Parameters**:
 
 | Parameters    | Type | Description |
@@ -132,6 +133,8 @@ int main ()
 {
     ThreadCreate("DMAThread",Thread_1,2);
     ThreadCreate("DataThread",Thread_2,4);
+
+    /* Rest of main */
 }
 ```
 ___
@@ -175,6 +178,8 @@ int main ()
 {
     ThreadCreate("DMAThread",Thread_1,2);
     ThreadCreate("DataThread",Thread_2,4);
+
+    /* Rest of main */
 }
 ```
 ___
@@ -195,6 +200,8 @@ int main
     /* Threads, Queues and Semaphores initializing */
     
     JARVIS_initKernel ();
+
+    while (1);  /* UNREACHABLE CODE */
 }
 ```
 ___
@@ -271,8 +278,7 @@ ___
 
 | Parameters    | Type | Description |
 | ------------- | ---- | ----------- |
-|  &SemphHandle |`SemaphoreHandle_t`  | Address to Semaphore |
-|  ThreadDelay| `uint32_t` | Delay Time in Quanta if there is no tokens |
+|  &SemphHandle |`SemaphoreHandle_t`  | Address to Semaphore  |
 
 * **Return**: `void`<br />
 * **Example**:
@@ -280,9 +286,10 @@ ___
 void Thread_1(void){
 
     while (1){
-        SemaphorePend(&semaphore_1,port_MAX_DELAY); /*port_MAX_DELAY is
-                                                      found at config file */
-        /* Thread Subroutine */
+        
+                 /* Thread Subroutine */
+
+        SemaphorePost(&semaphore_1);
     }
 }
 ```
@@ -325,7 +332,7 @@ ___
 | Parameters    | Type | Description |
 | ------------- | ---- | ----------- |
 |  queue |`QueueHandle_t`  | Queue Handle |
-|  size | `uint8_t` | Size of Each Location|
+|  data | `uint32_t` | Data to be written|
 
 * **Return**: `'1'`, If it successfully sent data to queue.<br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -336,13 +343,13 @@ QueueHandle_t queue_1;
 
 void Thread_1(void)
 {
-    uint8_t data = 87;
+    uint32_t data = 87;
 
     while (1)
     {
         /* Thread Subroutine */
 
-        uint8_t var = QueueWrite(queue_1,data);
+        int8_t var = QueueWrite(queue_1,data);
 
         if (var == -1)
         {
@@ -380,7 +387,7 @@ void Thread_8(void)
     {
         /* Thread Subroutine */
 
-        uint8_t var = QueueReceive(queue_1,&data_receive);
+        int8_t var = QueueReceive(queue_1,&data_receive);
 
         if (var == -1)
         {
@@ -422,7 +429,7 @@ ___
 ___
 ___
 ## Notes
-Jarvis-OS uses ARM Cortex-M processors SysTick timer. In order to port Jarvis to<br />
+• Jarvis-OS uses ARM Cortex-M processors SysTick timer. In order to port Jarvis to<br />
 your ARM processor, you need to extern `SysTick_Handler` in your startup (stub) code<br />
 and place it in SysTick location in the Interrupt Vector Table (IVT)
 ```c
@@ -430,3 +437,13 @@ and place it in SysTick location in the Interrupt Vector Table (IVT)
 
 extern void SysTick_Handler (void);
 ```
+• Since queues use dynamic allocation, change the value of heap size from the IDE you are using,<br /> or from the linker script if you're using text editors using this flag
+```bash
+--heap_size = <the value you want>
+```
+
+## Building ARM Project
+If you don't use ARM supported IDE's and just prefer using your own developing environment<br />
+You can still use Jarvis-OS!<br />
+I recommend to use my generic ARM Cortex Build system<br />
+Repository Link: [ARM Build System](https://github.com/heshamkhaledd/Build-System)
