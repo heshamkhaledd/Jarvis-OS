@@ -17,8 +17,8 @@ Table of contents
         * [Thread_Resume](#Thread_Resume)
         * [JARVIS_initKernel](#JARVIS_initKernel)
     * [Semaphores](#**•-Semaphores**)
-        * [CreateBinarySemaphore](#CreateBinarySemaphore)
-        * [CreateSemaphore](#CreateSemaphore)
+        * [CreateBinarySemaphore](#SemaphoreCreateBinary)
+        * [CreateSemaphore](#SemaphoreCreate)
         * [SemaphorePend](#SemaphorePend)
         * [SemaphorePost](#SemaphorePost)
     * [Queues](#**•-Queues**)
@@ -207,7 +207,7 @@ int main
 ___
 ___
 ### **• Semaphores**
-1) ### CreateBinarySemaphore
+1) ### SemaphoreCreateBinary
 ___
 * **Description**: Creates a Binary Semaphore of 1 token<br />
 * **Parameters**:
@@ -223,12 +223,12 @@ SemaphoreHandle_t semaphore_1;  /* Delacring a semaphore Handle */
 
 int main ()
 {
-    CreateBinarySemaphore (&semaphore_1);
+    SemaphoreCreateBinary (&semaphore_1);
     /* Rest of main */
 }
 ```
 ___
-2) ### CreateSemaphore
+2) ### SemaphoreCreate
 * **Description**: Creates a  Semaphore of given number of tokens<br />
 * **Parameters**:
 
@@ -245,7 +245,7 @@ SemaphoreHandle_t semaphore_1;  /* Delacring a semaphore Handle */
 int main ()
 {
     uint32_t num_of_tokens = 5;
-    CreateSemaphore (&semaphore_1,num_of_tokens);
+    SemaphoreCreate (&semaphore_1,num_of_tokens);
     /* Rest of main */
 }
 ```
@@ -296,6 +296,8 @@ void Thread_1(void){
 ___
 ___
 ### **• Queues**
+
+
 1) ### QueueCreate
 ___
 * **Description**: Creates a queue in heap segment of a given size<br />
@@ -334,9 +336,10 @@ ___
 |  queue |`QueueHandle_t`  | Queue Handle |
 |  data | `uint32_t` | Data to be written|
 
-* **Return**: `'1'`, If it successfully sent data to queue.<br />
+* **Return**: `ERROR_QUEUE_NULL`, If the queue doesn't exist<br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-`'-1'`, If the queue is already full.
+`'ERROR_QUEUE_FULL'`, If the queue is already full.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`'SUCCESS'`, If it successfully sent data to queue.
 * **Example**:
 ```c
 QueueHandle_t queue_1;
@@ -351,7 +354,7 @@ void Thread_1(void)
 
         int8_t var = QueueWrite(queue_1,data);
 
-        if (var == -1)
+        if (var == ERROR_QUEUE_FULL)
         {
             /* Code to handle the case */
         }
@@ -372,9 +375,10 @@ ___
 |  queue  |`QueueHandle_t`  | Queue Handle |
 |  &var | `uint32_t` | Variable to read the data into|
 
-* **Return**: `'1'`, If it successfully received data from queue.<br />
+* **Return**: `ERROR_QUEUE_NULL`, If the queue doesn't exist<br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-`'-1'`, If the queue is already empty.
+`'ERROR_QUEUE_EMPTY'`, If the queue is already empty.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`'SUCCESS'`, If it successfully received data from queue.
 * **Example**:
 ```c
 QueueHandle_t queue_1;

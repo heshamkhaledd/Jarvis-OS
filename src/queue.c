@@ -56,7 +56,7 @@ QueueHandle_t QueueCreate(uint32_t length, uint8_t size)
  * [Return]:        int8_t
  *
  *****************************************************************************/
-int8_t QueueWrite(QueueHandle_t queue, uint32_t data)
+uint8_t QueueWrite(QueueHandle_t queue, uint32_t data)
 {
     if (queue == NULL)
         return ERROR_QUEUE_NULL;
@@ -85,7 +85,7 @@ int8_t QueueWrite(QueueHandle_t queue, uint32_t data)
  *
  *****************************************************************************/
 
-int8_t QueueReceive(QueueHandle_t queue,uint32_t *var)
+uint8_t QueueReceive(QueueHandle_t queue,uint32_t *var)
 {
     if (queue == NULL)
         return ERROR_QUEUE_NULL;
